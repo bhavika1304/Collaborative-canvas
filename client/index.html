@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaborative Canvas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loading">
+    <div class="loading-spinner"></div>
+    <p>Connecting...</p>
+  </div>
+
+  <!-- Drawing Surface -->
+  <!-- We use two canvases: one for the persistent drawing, 
+       one for ephemeral cursors. This is *much* more performant. -->
+  <canvas id="drawing-canvas"></canvas>
+  <canvas id="cursor-canvas"></canvas>
+
+  <!-- Connection Status -->
+  <div id="connection-status"></div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="tool-group">
+      <label for="color-picker">Color</label>
+      <input type="color" id="color-picker" value="#000000">
+    </div>
+    <div class="tool-group">
+      <label for="line-width">Width: <span id="line-width-value">5</span></label>
+      <input type="range" id="line-width" min="1" max="50" value="5">
+    </div>
+    <div class="tool-group">
+      <button id="brush-btn" class="tool-btn active" title="Brush (B)">🖌️</button>
+      <button id="eraser-btn" class="tool-btn" title="Eraser (E)">🧼</button>
+    </div>
+    <div class="tool-group">
+      <button id="undo-btn" title="Undo (Ctrl+Z)" disabled>↩️</button>
+      <button id="redo-btn" title="Redo (Ctrl+Shift+Z)" disabled>↪️</button>
+    </div>
+    <div class="tool-group">
+      <button id="clear-btn" title="Clear All">🗑️</button>
+    </div>
+  </div>
+
+  <!-- User List -->
+  <div id="user-list">
+    <h3>Online</h3>
+    <ul id="users">
+      <!-- Users will be populated by main.js -->
+    </ul>
+  </div>
+
+  <!-- Keyboard Shortcuts Help -->
+  <div id="shortcuts-help" class="help-panel">
+    <button id="shortcuts-toggle" title="Keyboard Shortcuts">⌨️</button>
+    <div id="shortcuts-content" class="help-content hidden">
+      <h4>Keyboard Shortcuts</h4>
+      <ul>
+        <li><kbd>Ctrl+Z</kbd> / <kbd>⌘Z</kbd> - Undo</li>
+        <li><kbd>Ctrl+Shift+Z</kbd> / <kbd>⌘⇧Z</kbd> - Redo</li>
+        <li><kbd>B</kbd> - Brush tool</li>
+        <li><kbd>E</kbd> - Eraser tool</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Load Socket.io client and our scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- Load modules in order -->
+  <script src="canvas.js"></script>
+  <script src="websocket.js"></script>
+  <script src="main.js"></script>
+  
+  <!-- Shortcuts toggle script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('shortcuts-toggle');
+      const content = document.getElementById('shortcuts-content');
+      
+      if (toggle && content) {
+        toggle.addEventListener('click', () => {
+          content.classList.toggle('hidden');
+        });
+        
+        // Close when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!toggle.contains(e.target) && !content.contains(e.target)) {
+            content.classList.add('hidden');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
